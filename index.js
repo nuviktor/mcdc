@@ -1,9 +1,11 @@
 const config = require('./config');
+
 const { spawn } = require('child_process');
 const Discord = require('discord.js');
 const path = require('path');
 
 const client = new Discord.Client();
+
 const mcChat = /^\[\d\d:\d\d:\d\d] \[Server thread\/INFO\]: <([A-Za-z0-9_]+)> (.*)/;
 const mcPlayerActivity = new RegExp(
 	'^\\[\\d\\d:\\d\\d:\\d\\d\\] \\[Server thread\\/INFO\\]: ([A-Za-z0-9_]+) ' +

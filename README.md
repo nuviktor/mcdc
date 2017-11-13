@@ -10,7 +10,7 @@ The steps below assume you are already have a running Minecraft server on Linux 
 4. `$ cd mcdc`
 5. `$ npm install`
 6. `$ cp config.example.js config.js`
-7. Edit config.js, setting the path to the Minecraft jar, the maximum memory you want Minecraft to consume, the Discord app token from earlier, and the channel ID you saved as well.
+7. Edit `config.js`, setting the path to the Minecraft jar, the maximum memory you want Minecraft to consume, the Discord app token from earlier, and the channel ID you saved as well.
 8. Make sure the Minecraft server is stopped.
 9. Run `npm start` which will run the `index.js` file, starting the Minecraft server and establishing the bridge between Discord and Minecraft.
 
