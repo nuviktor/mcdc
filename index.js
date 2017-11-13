@@ -100,7 +100,7 @@ function isMessageFromSelf(message) {
 }
 
 function stripPrefix(command) {
-    return command.substring(config.dc.commandPrefix.length);
+	return command.substring(config.dc.commandPrefix.length);
 }
 
 client.login(config.dc.token);
