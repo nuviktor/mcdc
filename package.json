@@ -1,0 +1,15 @@
+{
+  "name": "mcdc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "discord.js": "^11.2.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Distemper",
+  "license": "GPL-3.0"
+}
