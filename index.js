@@ -1,28 +1,33 @@
 const config = require('./config');
 const { spawn } = require('child_process');
 const Discord = require('discord.js');
+const path = require('path');
 
 const client = new Discord.Client();
 const mcChat = /^\[\d\d:\d\d:\d\d] \[Server thread\/INFO\]: <([A-Za-z0-9_]+)> (.*)/;
-const mcPlayerActivity = new RegExp('^\\[\\d\\d:\\d\\d:\\d\\d\\] \\[Server thread\\/INFO\\]: ([A-Za-z0-9_]+) ' +
-                                    '(left the game|' +
-                                    'joined the game|' +
-                                    'has made the advancement .+|' +
-                                    'was .+|' +
-                                    'hugged a cactus|' +
-                                    'walked into a cactus.*|' +
-                                    'drowned.*|' +
-                                    'burned.*|' +
-                                    'blew up.*|' +
-                                    'hit the ground too hard|' +
-                                    'fell.*|' +
-                                    'went up in flames|' +
-                                    'walked into a fire.*|' +
-                                    'tried to swim in lava.*|' +
-                                    'discovered floor was lava.*|' +
-                                    'went off with a bang|' +
-                                    'got finished off by .+)'
-                                    );
+const mcPlayerActivity = new RegExp(
+	'^\\[\\d\\d:\\d\\d:\\d\\d\\] \\[Server thread\\/INFO\\]: ([A-Za-z0-9_]+) ' +
+	'(left the game|' +
+	'joined the game|' +
+	'has made the advancement .+|' +
+	'was .+|' +
+	'hugged a cactus|' +
+	'walked into a cactus.*|' +
+	'drowned.*|' +
+	'burned.*|' +
+	'blew up.*|' +
+	'hit the ground too hard|' +
+	'fell.*|' +
+	'went up in flames|' +
+	'walked into a fire.*|' +
+	'tried to swim in lava.*|' +
+	'discovered floor was lava.*|' +
+	'went off with a bang|' +
+	'got finished off by .+)'
+);
+
+const mcJar = path.basename(config.mc.path);
+const mcDir = path.dirname(config.mc.path);
 
 var mcProc;
 var mcProcAlive = false;
@@ -49,9 +54,17 @@ function mcOnExit(error) {
 }
 
 function mcSpawn() {
-	return spawn('java', [`-Xmx${config.mc.memory}`, `-Xms${config.mc.memory}`, '-jar', `minecraft_server.${config.mc.version}.jar`, 'nogui'], {
-		cwd: config.mc.path
-	});
+	return spawn(
+		'java',
+		[
+			`-Xmx${config.mc.memory}`,
+			`-Xms${config.mc.memory}`,
+			'-jar', mcJar, 'nogui'
+		],
+		{
+			cwd: mcDir
+		}
+	);
 }
 
 function mcStartProc() {
@@ -113,7 +126,6 @@ client.on('message', message => {
 				message.channel.send('Server already started');
 			}
 		}
-
 	} else if (isMessageFromChannel(message) && ! isMessageFromSelf(message)) {
 		const user = message.author.username;
 		const content = message.content.replace(/[\n\r]/g, ' ').substring(0, 1024);
