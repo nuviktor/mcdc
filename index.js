@@ -42,7 +42,7 @@ function mcOnStdout(data) {
 	else if ((result = mcPlayerActivity.exec(line)) && dcChannel)
 		dcChannel.send(`**${result[1]}** ${result[2]}`);
 
-	process.stdout.write(data.toString());
+	process.stdout.write(`[MC] [OUT] ${data.toString()}`);
 }
 
 function mcOnExit(error) {
@@ -77,7 +77,7 @@ function mcStartProc() {
 	mcProc.stdin.setEncoding('utf-8');
 	mcProc.stdout.on('data', mcOnStdout);
 	mcProc.stderr.on('data', data => {
-		process.stderr.write(data.toString());
+		process.stdout.write(`[MC] [ERR] ${data.toString()}`);
 	});
 	mcProc.on('exit', mcOnExit);
 }
