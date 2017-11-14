@@ -35,24 +35,54 @@ var mcProc;
 var mcProcAlive = false;
 var dcChannel;
 
+function dcLog(line) {
+	process.stdout.write(`[DC] ${line}\n`);
+}
+
+function mcLog(line) {
+	process.stdout.write(`[MC] ${line}\n`);
+}
+
+function dcLogError(error) {
+	process.stderr.write(`[DC] [!] ${error}\n`);
+}
+
+function mcLogError(error) {
+	process.stderr.write(`[MC] [!] ${error}\n`);
+}
+
+function mcLogProc(line, fd) {
+	if (fd == 1)
+		process.stdout.write(`[MC] [OUT] ${line}`);
+	else
+		process.stdout.write(`[MC] [ERR] ${line}`);
+}
+
 function mcOnStdout(data) {
 	let result;
 	const line = data.toString();
 
 	if ((result = mcChat.exec(line)) && dcChannel)
-		dcChannel.send(`<${result[1]}> ${result[2]}`);
+		dcChannel.send(`<${result[1]}> ${result[2]}`).catch(dcLogError)
 	else if ((result = mcPlayerActivity.exec(line)) && dcChannel)
-		dcChannel.send(`**${result[1]}** ${result[2]}`);
+		dcChannel.send(`**${result[1]}** ${result[2]}`).catch(dcLogError);
 
-	process.stdout.write(`[MC] [OUT] ${data.toString()}`);
+	mcLogProc(line, 1);
 }
 
-function mcOnExit(error) {
-	process.stdout.write('[MC] Server stopped\n');
-	mcProcAlive = false;
+function mcOnExit(code) {
+	let line = 'Server exited cleanly';
 
-	if (dcChannel)
-		dcChannel.send('Server exited');
+	if (code == 0) {
+		mcLog(line);
+		if (dcChannel) dcChannel.send(line).catch(dcLogError);
+	} else {
+		line = `Server exited with code ${code}`;
+		mcLogError(line);
+		if (dcChannel) dcChannel.send(line).catch(dcLogError);
+	}
+
+	mcProcAlive = false;
 }
 
 function mcSpawn() {
@@ -70,16 +100,15 @@ function mcSpawn() {
 }
 
 function mcStartProc() {
-	process.stdout.write('[MC] Starting server\n');
+	mcLog('Starting server');
 
 	mcProc = mcSpawn();
-
 	mcProcAlive = true;
 
 	mcProc.stdin.setEncoding('utf-8');
 	mcProc.stdout.on('data', mcOnStdout);
 	mcProc.stderr.on('data', data => {
-		process.stdout.write(`[MC] [ERR] ${data.toString()}`);
+		mcLogProc(data.toString(), 2);
 	});
 	mcProc.on('exit', mcOnExit);
 }
@@ -108,7 +137,7 @@ function stripPrefix(command) {
 client.login(config.dc.token);
 
 client.on('ready', () => {
-	process.stdout.write('[DC] Client ready\n');
+	dcLog('Client ready');
 
 	dcChannel = client.channels.get(config.dc.channel);
 
