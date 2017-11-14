@@ -14,18 +14,20 @@ const mcPlayerActivity = new RegExp(
 	'has made the advancement .+|' +
 	'was .+|' +
 	'hugged a cactus|' +
-	'walked into a cactus.*|' +
+	'walked into a cactus .+|' +
 	'drowned.*|' +
-	'burned.*|' +
-	'blew up.*|' +
+	'burned to death|' +
+	'blew up|' +
 	'hit the ground too hard|' +
-	'fell.*|' +
+	'fell .+|' +
 	'went up in flames|' +
-	'walked into a fire.*|' +
+	'walked into a fire .+|' +
 	'tried to swim in lava.*|' +
-	'discovered floor was lava.*|' +
+	'discovered floor was lava|' +
 	'went off with a bang|' +
-	'got finished off by .+)'
+	'got finished off by .+|' +
+	'experienced kinetic energy|' +
+	'removed an elytra while flying)'
 );
 
 const mcJar = path.basename(config.mc.path);
@@ -39,8 +41,8 @@ function dcLog(line) {
 	process.stdout.write(`[DC] ${line}\n`);
 }
 
-function mcLog(line) {
-	process.stdout.write(`[MC] ${line}\n`);
+function mcLog(line, newline = true) {
+	process.stdout.write(`[MC] ${line}${newline ? '\n' : ''}`);
 }
 
 function dcLogError(error) {
@@ -53,9 +55,9 @@ function mcLogError(error) {
 
 function mcLogProc(line, fd) {
 	if (fd == 1)
-		process.stdout.write(`[MC] [OUT] ${line}`);
+		mcLog(`[OUT] ${line}`, false);
 	else
-		process.stdout.write(`[MC] [ERR] ${line}`);
+		mcLog(`[ERR] ${line}`, false);
 }
 
 function mcOnStdout(data) {
@@ -63,7 +65,7 @@ function mcOnStdout(data) {
 	const line = data.toString();
 
 	if ((result = mcChat.exec(line)) && dcChannel)
-		dcChannel.send(`<${result[1]}> ${result[2]}`).catch(dcLogError)
+		dcChannel.send(`<${result[1]}> ${result[2]}`).catch(dcLogError);
 	else if ((result = mcPlayerActivity.exec(line)) && dcChannel)
 		dcChannel.send(`**${result[1]}** ${result[2]}`).catch(dcLogError);
 
@@ -100,8 +102,6 @@ function mcSpawn() {
 }
 
 function mcStartProc() {
-	mcLog('Starting server');
-
 	mcProc = mcSpawn();
 	mcProcAlive = true;
 
@@ -141,8 +141,10 @@ client.on('ready', () => {
 
 	dcChannel = client.channels.get(config.dc.channel);
 
-	if (! mcProcAlive)
+	if (! mcProcAlive) {
+		mcLog('Starting server');
 		mcStartProc();
+	}
 });
 
 client.on('message', message => {
@@ -150,11 +152,18 @@ client.on('message', message => {
 		const command = stripPrefix(message.content).split(/\s+/);
 
 		if (command[0] == 'start') {
+			dcLog('Received command: start');
+
+			let line = 'Starting server';
+
 			if (! mcProcAlive) {
-				message.channel.send('Starting server');
+				mcLog(line);
+				message.channel.send(line);
 				mcStartProc();
 			} else {
-				message.channel.send('Server already started');
+				line = 'Server already started';
+				mcLog(line);
+				message.channel.send(line);
 			}
 		}
 	} else if (isMessageFromChannel(message) && ! isMessageFromSelf(message)) {
