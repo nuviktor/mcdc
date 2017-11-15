@@ -64,10 +64,13 @@ function mcOnStdout(data) {
 	let result;
 	const line = data.toString();
 
-	if ((result = mcChat.exec(line)) && dcChannel)
+	if ((result = mcChat.exec(line)) && dcChannel) {
+		dcLog('Sending chat message');
 		dcChannel.send(`<${result[1]}> ${result[2]}`).catch(dcLogError);
-	else if ((result = mcPlayerActivity.exec(line)) && dcChannel)
+	} else if ((result = mcPlayerActivity.exec(line)) && dcChannel) {
+		dcLog('Sending player activity message');
 		dcChannel.send(`**${result[1]}** ${result[2]}`).catch(dcLogError);
+	}
 
 	mcLogProc(line, 1);
 }
@@ -166,11 +169,10 @@ client.on('message', message => {
 				message.channel.send(line);
 			}
 		}
-	} else if (isMessageFromChannel(message) && ! isMessageFromSelf(message)) {
+	} else if (isMessageFromChannel(message) && ! isMessageFromSelf(message) && mcProcAlive) {
 		const user = message.author.username;
 		const content = message.content.replace(/[\n\r]/g, ' ').substring(0, 1024);
 
-		if (mcProcAlive)
-			mcProc.stdin.write(`/say <${user}> ${content}\n`);
+		mcProc.stdin.write(`/say <${user}> ${content}\n`);
     }
 });

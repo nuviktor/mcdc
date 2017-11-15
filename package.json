@@ -8,7 +8,8 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "mc": "node mc.js"
   },
   "author": "Distemper",
   "license": "GPL-3.0"
