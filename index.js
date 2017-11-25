@@ -6,12 +6,12 @@ const path = require('path');
 
 const client = new Discord.Client();
 
-const mcChat = /^\[\d\d:\d\d:\d\d] \[Server thread\/INFO\]: <([A-Za-z0-9_]+)> (.*)/;
+const mcChat = /^\[\d\d:\d\d:\d\d\] \[Server thread\/INFO\]: <([A-Za-z0-9_]+)> (.*)/;
+const mcPlayerJoin = /^\[\d\d:\d\d:\d\d\] \[Server thread\/INFO\]: ([A-Za-z0-9_]+) (joined the game)/;
+const mcPlayerLeave = /^\[\d\d:\d\d:\d\d\] \[Server thread\/INFO\]: ([A-Za-z0-9_]+) (left the game)/;
 const mcPlayerActivity = new RegExp(
 	'^\\[\\d\\d:\\d\\d:\\d\\d\\] \\[Server thread\\/INFO\\]: ([A-Za-z0-9_]+) ' +
-	'(left the game|' +
-	'joined the game|' +
-	'has made the advancement .+|' +
+	'(has made the advancement .+|' +
 	'was .+|' +
 	'hugged a cactus|' +
 	'walked into a cactus .+|' +
@@ -35,6 +35,8 @@ const mcDir = path.dirname(config.mc.path);
 
 var mcProc;
 var mcProcAlive = false;
+var mcPlayers = [];
+
 var dcChannel;
 
 function dcLog(line) {
@@ -64,15 +66,25 @@ function mcOnStdout(data) {
 	let result;
 	const line = data.toString();
 
-	if ((result = mcChat.exec(line)) && dcChannel) {
+	mcLogProc(line, 1);
+
+	if (result = mcChat.exec(line)) {
 		dcLog('Sending chat message');
 		dcChannel.send(`<${result[1]}> ${result[2]}`).catch(dcLogError);
-	} else if ((result = mcPlayerActivity.exec(line)) && dcChannel) {
+	} else if (result = mcPlayerJoin.exec(line)) {
+		mcPlayers.push(result[1]);
+
+		dcLog('Sending player join message');
+		dcChannel.send(`**${result[1]}** ${result[2]}`).catch(dcLogError);
+	} else if (result = mcPlayerLeave.exec(line)) {
+		mcPlayers.splice(mcPlayers.indexOf(result[1]), 1);
+
+		dcLog('Sending player leave message');
+		dcChannel.send(`**${result[1]}** ${result[2]}`).catch(dcLogError);
+	} else if (result = mcPlayerActivity.exec(line)) {
 		dcLog('Sending player activity message');
 		dcChannel.send(`**${result[1]}** ${result[2]}`).catch(dcLogError);
 	}
-
-	mcLogProc(line, 1);
 }
 
 function mcOnExit(code) {
@@ -153,21 +165,34 @@ client.on('ready', () => {
 client.on('message', message => {
 	if (isMessageCommand(message)) {
 		const command = stripPrefix(message.content).split(/\s+/);
+		const channel = message.channel;
 
-		if (command[0] == 'start') {
-			dcLog('Received command: start');
+		dcLog(`Received command: ${command[0]}`);
 
-			let line = 'Starting server';
+		switch (command[0]) {
+			case 'start':
+				let line = 'Starting server';
 
-			if (! mcProcAlive) {
-				mcLog(line);
-				message.channel.send(line);
-				mcStartProc();
-			} else {
-				line = 'Server already started';
-				mcLog(line);
-				message.channel.send(line);
-			}
+				if (! mcProcAlive) {
+					mcLog(line);
+					channel.send(line);
+					mcStartProc();
+				} else {
+					line = 'Server already started';
+					mcLog(line);
+					channel.send(line);
+				}
+			break;
+			case 'status':
+				const playerList = mcPlayers.join(', ');
+
+				if (mcPlayers.length == 0)
+					channel.send('There are 0 players online');
+				else if (mcPlayers.length == 1)
+					channel.send(`There is 1 player online:\n\n${playerList}`);
+				else
+					channel.send(`There are ${mcPlayers.length} players online:\n\n${playerList}`);
+			break;
 		}
 	} else if (isMessageFromChannel(message) && ! isMessageFromSelf(message) && mcProcAlive) {
 		const user = message.author.username;

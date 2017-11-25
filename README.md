@@ -16,5 +16,6 @@ The steps below assume you are already have a running Minecraft server on Linux 
 
 ## Todo
 
-* Implement status command
-* Make emoticons, highlights, channel links and screenshots show up better in Minecraft
+* Implement uptime command.
+* Make emoticons, highlights, channel links and screenshots show up better in Minecraft.
+* Stop server in event of error (server currently gets disowned).
