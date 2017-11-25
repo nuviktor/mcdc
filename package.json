@@ -6,7 +6,6 @@
   "dependencies": {
     "discord.js": "^11.2.1"
   },
-  "devDependencies": {},
   "scripts": {
     "start": "node index.js",
     "mc": "node mc.js"

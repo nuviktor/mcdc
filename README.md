@@ -19,3 +19,4 @@ The steps below assume you are already have a running Minecraft server on Linux 
 * Implement uptime command.
 * Make emoticons, highlights, channel links and screenshots show up better in Minecraft.
 * Stop server in event of error (server currently gets disowned).
+* Translate names between Discord and Minecraft.

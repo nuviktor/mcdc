@@ -92,11 +92,11 @@ function mcOnExit(code) {
 
 	if (code == 0) {
 		mcLog(line);
-		if (dcChannel) dcChannel.send(line).catch(dcLogError);
+		dcChannel.send(line).catch(dcLogError);
 	} else {
 		line = `Server exited with code ${code}`;
 		mcLogError(line);
-		if (dcChannel) dcChannel.send(line).catch(dcLogError);
+		dcChannel.send(line).catch(dcLogError);
 	}
 
 	mcProcAlive = false;
@@ -186,13 +186,17 @@ client.on('message', message => {
 			case 'status':
 				const playerList = mcPlayers.join(', ');
 
-				if (mcPlayers.length == 0)
+				if (! mcProcAlive)
+					channel.send('The server is not running');
+				else if (mcPlayers.length == 0)
 					channel.send('There are 0 players online');
 				else if (mcPlayers.length == 1)
 					channel.send(`There is 1 player online:\n\n${playerList}`);
 				else
 					channel.send(`There are ${mcPlayers.length} players online:\n\n${playerList}`);
 			break;
+			default:
+				channel.send('Command does not exist');
 		}
 	} else if (isMessageFromChannel(message) && ! isMessageFromSelf(message) && mcProcAlive) {
 		const user = message.author.username;
