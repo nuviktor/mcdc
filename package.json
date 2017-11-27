@@ -1,7 +1,7 @@
 {
   "name": "mcdc",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "Vanilla Minecraft <-> Discord integration",
   "main": "index.js",
   "dependencies": {
     "discord.js": "^11.2.1"
@@ -10,6 +10,6 @@
     "start": "node index.js",
     "mc": "node mc.js"
   },
-  "author": "Distemper",
+  "author": "Viktor Numerov",
   "license": "GPL-3.0"
 }

@@ -182,13 +182,13 @@ client.on('message', message => {
 				const playerList = mcPlayers.join(', ');
 
 				if (! mcProcAlive)
-					channel.send('The server is not running');
+					channel.send('Server not running');
 				else if (mcPlayers.length == 0)
-					channel.send('There are 0 players online');
+					channel.send('No players online');
 				else if (mcPlayers.length == 1)
-					channel.send(`There is 1 player online:\n\n${playerList}`);
+					channel.send(`1 player online:\n\n${playerList}`);
 				else
-					channel.send(`There are ${mcPlayers.length} players online:\n\n${playerList}`);
+					channel.send(`${mcPlayers.length} players online:\n\n${playerList}`);
 			break;
 			default:
 				channel.send('Command does not exist');

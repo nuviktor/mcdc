@@ -2,7 +2,7 @@
 
 ## Installation
 
-The steps below assume you are already have a running Minecraft server on Linux with NodeJS, NPM and git installed.
+The steps below assume you already have a running Minecraft server on Linux with NodeJS, NPM and git installed.
 
 1. [Set up a Discord app](https://discordapp.com/developers/applications/me) with a bot user and add it to your server. Save the token (but keep it secret).
 2. Get the ID of the channel where you want to relay messages between Minecraft and Discord and save it.
