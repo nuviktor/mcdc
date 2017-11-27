@@ -55,7 +55,7 @@ function mcLogError(error) {
 	process.stderr.write(`[MC] [!] ${error}\n`);
 }
 
-function mcLogProc(line, fd) {
+function mcLogProc(line, fd = 1) {
 	if (fd == 1)
 		mcLog(`[OUT] ${line}`, false);
 	else
@@ -66,7 +66,7 @@ function mcOnStdout(data) {
 	let result;
 	const line = data.toString();
 
-	mcLogProc(line, 1);
+	mcLogProc(line);
 
 	if (result = mcChat.exec(line)) {
 		dcChannel.send(`<${result[1]}> ${result[2]}`).catch(dcLogError);
@@ -132,7 +132,7 @@ function isMessageCommand(message) {
 	return message.content.startsWith(config.dc.commandPrefix);
 }
 
-function isMessageFromChannel(message) {
+function isMessageInChannel(message) {
 	return message.channel.id == config.dc.channel;
 }
 
@@ -193,7 +193,7 @@ client.on('message', message => {
 			default:
 				channel.send('Command does not exist');
 		}
-	} else if (isMessageFromChannel(message) && ! isMessageFromSelf(message) && mcProcAlive) {
+	} else if (isMessageInChannel(message) && ! isMessageFromSelf(message) && mcProcAlive) {
 		const user = message.author.username;
 		const content = message.content.replace(/[\n\r]/g, ' ').substring(0, 1024);
 
