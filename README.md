@@ -1,5 +1,12 @@
 # Minecraft/Discord integration
 
+## Usage
+
+Assuming the default prefix, you can run the following commands:
+
+* `mcstart` - will start the server again if it crashed.
+* `mcstatus` - will reply with the current number of players on the server and their names.
+
 ## Installation
 
 The steps below assume you already have a running Minecraft server on Linux with NodeJS, NPM and git installed.
