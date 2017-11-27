@@ -69,20 +69,14 @@ function mcOnStdout(data) {
 	mcLogProc(line, 1);
 
 	if (result = mcChat.exec(line)) {
-		dcLog('Sending chat message');
 		dcChannel.send(`<${result[1]}> ${result[2]}`).catch(dcLogError);
 	} else if (result = mcPlayerJoin.exec(line)) {
 		mcPlayers.push(result[1]);
-
-		dcLog('Sending player join message');
 		dcChannel.send(`**${result[1]}** ${result[2]}`).catch(dcLogError);
 	} else if (result = mcPlayerLeave.exec(line)) {
 		mcPlayers.splice(mcPlayers.indexOf(result[1]), 1);
-
-		dcLog('Sending player leave message');
 		dcChannel.send(`**${result[1]}** ${result[2]}`).catch(dcLogError);
 	} else if (result = mcPlayerActivity.exec(line)) {
-		dcLog('Sending player activity message');
 		dcChannel.send(`**${result[1]}** ${result[2]}`).catch(dcLogError);
 	}
 }
@@ -99,6 +93,7 @@ function mcOnExit(code) {
 		dcChannel.send(line).catch(dcLogError);
 	}
 
+	mcPlayers = [];
 	mcProcAlive = false;
 }
 
